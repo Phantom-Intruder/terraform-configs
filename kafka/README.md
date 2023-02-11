@@ -19,14 +19,50 @@ terraform init
 terraform apply
 ```
 
+Deployment will take up to 5 minutes. You can look at the progress with:
+
+```
+kubectl get po -n kafka --watch
+```
+
+Your end result should be:
+
+```
+NAME                                         READY   STATUS 
+my-cluster-entity-operator-795fb55fc-j5k64   3/3     Running
+my-cluster-kafka-0                           1/1     Running
+my-cluster-zookeeper-0                       1/1     Running
+strimzi-cluster-operator-77cf4d89cb-cwwgd    1/1     Running
+```
+
+You can also observe the services:
+
+```
+kubectl get svc -n kafka
+```
+
+The end result should look like this:
+
+```
+NAME                                  TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                            
+my-cluster-kafka-0                    NodePort    10.96.101.238    <none>        9094:31974/TCP                     
+my-cluster-kafka-bootstrap            ClusterIP   10.111.186.126   <none>        9091/TCP,9092/TCP,9093/TCP         
+my-cluster-kafka-brokers              ClusterIP   None             <none>        9090/TCP,9091/TCP,9092/TCP,9093/TCP
+my-cluster-kafka-external-bootstrap   NodePort    10.104.103.135   <none>        9094:31912/TCP                     
+my-cluster-zookeeper-client           ClusterIP   10.107.3.32      <none>        2181/TCP                           
+my-cluster-zookeeper-nodes            ClusterIP   None             <none>        2181/TCP,2888/TCP,3888/TCP         
+```
+
+## Running producers and consumers
+
 Run the producer with:
 
 ```
-kubectl run kafka-producer -ti --image=quay.io/strimzi/kafka:0.32.0-kafka-3.3.1 --rm=true --restart=Never -- bin/kafka-console-producer.sh --bootstrap-server my-cluster-kafka-bootstrap:9092 --topic my-topic
+kubectl run kafka-producer -n kafka -ti --image=quay.io/strimzi/kafka:0.32.0-kafka-3.3.1 --rm=true --restart=Never -- bin/kafka-console-producer.sh --bootstrap-server my-cluster-kafka-bootstrap:9092 --topic my-topic
 ```
 
 Run the consumer with:
 
 ```
-kubectl run kafka-consumer -ti --image=quay.io/strimzi/kafka:0.32.0-kafka-3.3.1 --rm=true --restart=Never -- bin/kafka-console-consumer.sh --bootstrap-server my-cluster-kafka-bootstrap:9092 --topic my-topic --from-beginning
+kubectl run kafka-consumer -n kafka -ti --image=quay.io/strimzi/kafka:0.32.0-kafka-3.3.1 --rm=true --restart=Never -- bin/kafka-console-consumer.sh --bootstrap-server my-cluster-kafka-bootstrap:9092 --topic my-topic --from-beginning
 ```
