@@ -4,7 +4,7 @@ from kafka.errors import KafkaError
 producer = KafkaProducer(bootstrap_servers=['my-cluster-kafka-external-bootstrap:9094'])
 
 # Asynchronous by default
-future = producer.send('my-topic', b'raw_bytes')
+future = producer.send('my-topic', b'Hello from the Python producer!!')
 
 # Block for 'synchronous' sends
 try:
@@ -20,7 +20,7 @@ print (record_metadata.partition)
 print (record_metadata.offset)
 
 # produce keyed messages to enable hashed partitioning
-producer.send('my-topic', key=b'foo', value=b'bar')
+producer.send('my-topic', key=b'This message is coming from an image', value=b'bar')
 
 def on_send_success(record_metadata):
     print(record_metadata.topic)
@@ -32,10 +32,10 @@ def on_send_error(excp):
     # handle exception
 
 # produce asynchronously with callbacks
-producer.send('my-topic', b'raw_bytes').add_callback(on_send_success).add_errback(on_send_error)
+producer.send('my-topic', b'This is another message').add_callback(on_send_success).add_errback(on_send_error)
 
 # block until all async messages are sent
 producer.flush()
 
 # configure multiple retries
-producer = KafkaProducer(retries=5)
+#producer = KafkaProducer(retries=5)
