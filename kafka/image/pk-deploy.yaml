@@ -5,5 +5,4 @@ metadata:
 spec:
   containers:
     - name: python-kafka
-      image: python-kafka:1.0
-      imagePullPolicy: Never
+      image: python-kafka:latest
