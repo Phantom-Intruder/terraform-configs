@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: Pod
-metadata:
-  name: py-kafka
-spec:
-  containers:
-    - name: python-kafka
-      image: python-kafka:latest

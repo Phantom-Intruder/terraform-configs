@@ -58,11 +58,37 @@ my-cluster-zookeeper-nodes            ClusterIP   None             <none>       
 Run the producer with:
 
 ```
-kubectl run kafka-producer -n kafka -ti --image=quay.io/strimzi/kafka:0.32.0-kafka-3.3.1 --rm=true --restart=Never -- bin/kafka-console-producer.sh --bootstrap-server my-cluster-kafka-bootstrap:9092 --topic my-topic
+kubectl run kafka-producer -n kafka -ti --image=quay.io/strimzi/kafka:0.32.0-kafka-3.3.1 --rm=true --restart=Never -- bin/kafka-console-producer.sh --bootstrap-server my-cluster-kafka-external-bootstrap:9094 --topic my-topic
 ```
 
 Run the consumer with:
 
 ```
-kubectl run kafka-consumer -n kafka -ti --image=quay.io/strimzi/kafka:0.32.0-kafka-3.3.1 --rm=true --restart=Never -- bin/kafka-console-consumer.sh --bootstrap-server my-cluster-kafka-bootstrap:9092 --topic my-topic --from-beginning
+kubectl run kafka-consumer -n kafka -ti --image=quay.io/strimzi/kafka:0.32.0-kafka-3.3.1 --rm=true --restart=Never -- bin/kafka-console-consumer.sh --bootstrap-server my-cluster-kafka-external-bootstrap:9094 --topic my-topic --from-beginning
 ```
+
+## Running the sample Python producer
+
+This project also comes with a Python producer. To use it, first run the consumer:
+
+```
+kubectl run kafka-consumer -n kafka -ti --image=quay.io/strimzi/kafka:0.32.0-kafka-3.3.1 --rm=true --restart=Never -- bin/kafka-console-consumer.sh --bootstrap-server my-cluster-kafka-external-bootstrap:9094--topic my-topic --from-beginning
+```
+
+Now, open a terminal instacne in the python-producer folder and run:
+
+```
+terraform init
+```
+
+```
+terraform apply
+```
+
+This will pull an image from Docker Hub that contains a simple python producer set to run run when the container is started. The Dockerfile and Python code for this image can be found in the `image` folder. This image will be used to deploy a pod into your existing Kubernetes cluster. You can see this pod running with:
+
+```
+kubectl get po -n kafka
+```
+
+When the pod starts, you should see messages appearing in the consumer window you previously opened.
